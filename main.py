@@ -49,17 +49,14 @@ def generate_video(input_img_path, repo_id, output_video_path, device="cuda"):
         use_auth_token = token,
     )
 
-    # 设置设备
     pipeline.to(device)
 
-    # 调整和裁剪输入图像
     input_image = resize_image(input_img_path)
 
     # 转换为Tensor并标准化
     input_tensor = torch.unsqueeze(torch.tensor(np.array(input_image)).permute(2, 0, 1).float() / 255.0, 0).to(device)
 
     with torch.no_grad():
-        # 生成视频，减少推理步骤和解码批次大小
         video = pipeline(input_tensor, num_inference_steps=10 , decode_chunk_size=1)
 
     # 获取 video 中的 frames 字段
@@ -80,12 +77,12 @@ def generate_video(input_img_path, repo_id, output_video_path, device="cuda"):
     writer = cv2.VideoWriter(
         output_video_path,
         cv2.VideoWriter_fourcc(*"mp4v"),
-        6,  # FPS (可根据需求调整)
+        6,  # FPS
         (frames.shape[2], frames.shape[1])
     )
 
     for frame in frames:
-        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)  # 将RGB转换为BGR格式，适用于OpenCV
+        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         writer.write(frame_bgr)
 
     writer.release()
@@ -94,9 +91,9 @@ def generate_video(input_img_path, repo_id, output_video_path, device="cuda"):
 
 if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    input_img_path = os.path.join(current_dir,  "pic.png")  # 相对路径输入图像
-    output_video_path = os.path.join(current_dir,  "output_video.mp4")  # 相对路径输出视频
-    repo_id = "stabilityai/stable-video-diffusion-img2vid-xt-1-1"  # 模型仓库ID
+    input_img_path = os.path.join(current_dir,  "pic.png")
+    output_video_path = os.path.join(current_dir,  "output_video.mp4")
+    repo_id = "stabilityai/stable-video-diffusion-img2vid-xt-1-1"
 
     generate_video(input_img_path, repo_id,  output_video_path)
 
