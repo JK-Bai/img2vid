@@ -2,3 +2,4 @@ torch
 diffusers
 Pillow
 huggingface_hub
+accelerate
